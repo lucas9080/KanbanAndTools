@@ -1,6 +1,6 @@
-## Projeto KanbanAndTools, feito em next.js, React.js e Typescript, com Opencode.
+# Projeto KanbanAndTools, feito em next.js, React.js e Typescript, com Opencode.
 
-# Para acessar a dashboard, usar esse login de teste:
+##  Para acessar a dashboard, usar esse login de teste:
 
 login: dashkanban
 senha: 12345
