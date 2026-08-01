@@ -15,6 +15,7 @@ export interface Task {
   status: "todo" | "doing" | "done";
   paused: boolean;
   pauseReason?: string;
+  archived: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,6 +28,8 @@ interface TaskContextType {
   togglePause: (id: string, reason?: string) => void;
   moveTask: (id: string, status: Task["status"]) => void;
   reorderTasks: (status: Task["status"], from: number, to: number) => void;
+  archiveTask: (id: string) => void;
+  unarchiveTask: (id: string) => void;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -43,7 +46,10 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     if (typeof window === "undefined") return [];
     const stored = localStorage.getItem("kanban-tasks");
     if (stored) {
-      try { return JSON.parse(stored) as Task[]; } catch { return []; }
+      try {
+        const parsed = JSON.parse(stored) as Task[];
+        return parsed.map((t) => ({ ...t, archived: t.archived ?? false }));
+      } catch { return []; }
     }
     return [];
   });
@@ -60,6 +66,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       description,
       status: "todo",
       paused: false,
+      archived: false,
       createdAt: now,
       updatedAt: now,
     };
@@ -119,6 +126,26 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const archiveTask = (id: string) => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === id
+          ? { ...t, archived: true, updatedAt: new Date().toISOString() }
+          : t
+      )
+    );
+  };
+
+  const unarchiveTask = (id: string) => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === id
+          ? { ...t, archived: false, updatedAt: new Date().toISOString() }
+          : t
+      )
+    );
+  };
+
   return (
     <TaskContext.Provider
       value={{
@@ -129,6 +156,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         togglePause,
         moveTask,
         reorderTasks,
+        archiveTask,
+        unarchiveTask,
       }}
     >
       {children}

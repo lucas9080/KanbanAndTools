@@ -12,6 +12,7 @@ interface SortableTaskCardProps {
   onTogglePause: (id: string) => void;
   onMoveLeft: (id: string) => void;
   onMoveRight: (id: string) => void;
+  onArchive: (id: string) => void;
 }
 
 export function SortableTaskCard({
@@ -21,6 +22,7 @@ export function SortableTaskCard({
   onTogglePause,
   onMoveLeft,
   onMoveRight,
+  onArchive,
 }: SortableTaskCardProps) {
   const {
     attributes,
@@ -80,14 +82,23 @@ export function SortableTaskCard({
           >
             {task.title}
           </h3>
-          {task.paused && (
-            <span
-              className="shrink-0 rounded bg-yellow-200 px-1.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-700 dark:text-yellow-200"
-              title={task.pauseReason}
+          <div className="flex shrink-0 items-center gap-1">
+            {task.paused && (
+              <span
+                className="rounded bg-yellow-200 px-1.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-700 dark:text-yellow-200"
+                title={task.pauseReason}
+              >
+                ⏸ pausada
+              </span>
+            )}
+            <button
+              onClick={() => onArchive(task.id)}
+              className="rounded px-1.5 py-0.5 text-xs font-medium text-gray-500 hover:bg-purple-50 hover:text-purple-600 dark:text-gray-400 dark:hover:bg-purple-900/30 dark:hover:text-purple-300"
+              title="Arquivar tarefa"
             >
-              ⏸ pausada
-            </span>
-          )}
+              🗃️
+            </button>
+          </div>
         </div>
 
         {task.description && (

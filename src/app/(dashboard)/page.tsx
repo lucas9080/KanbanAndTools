@@ -13,7 +13,6 @@ import {
 } from "@dnd-kit/core";
 import { useTasks, type Task } from "@/context/TaskContext";
 import { useAuth } from "@/context/AuthContext";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { TaskColumn } from "@/components/TaskColumn";
 import { TaskForm } from "@/components/TaskForm";
 import { EditTaskModal } from "@/components/EditTaskModal";
@@ -26,7 +25,7 @@ const columns: { title: string; status: Task["status"] }[] = [
 ];
 
 export default function Home() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
 
   const {
@@ -36,6 +35,7 @@ export default function Home() {
     removeTask,
     togglePause,
     moveTask,
+    archiveTask,
   } = useTasks();
 
   const [addingToColumn, setAddingToColumn] = useState<Task["status"] | null>(null);
@@ -47,14 +47,16 @@ export default function Home() {
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
+  const activeTasks = useMemo(() => tasks.filter((t) => !t.archived), [tasks]);
+
   const tasksByStatus = useMemo(
     () =>
       ({
-        todo: tasks.filter((t) => t.status === "todo"),
-        doing: tasks.filter((t) => t.status === "doing"),
-        done: tasks.filter((t) => t.status === "done"),
+        todo: activeTasks.filter((t) => t.status === "todo"),
+        doing: activeTasks.filter((t) => t.status === "doing"),
+        done: activeTasks.filter((t) => t.status === "done"),
       }) as Record<Task["status"], Task[]>,
-    [tasks]
+    [activeTasks]
   );
 
   const handleAddTask = useCallback(
@@ -140,27 +142,16 @@ export default function Home() {
 
   return (
     <main className="min-h-screen p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-          Kanban
-        </h1>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => { logout(); router.push("/login"); }}
-            className="rounded-full p-2 text-sm shadow-md transition-colors hover:bg-gray-200 dark:hover:bg-gray-600 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600"
-          >
-            Sair
-          </button>
-          <ThemeToggle />
-        </div>
-      </div>
+      <h1 className="mb-8 text-2xl font-bold text-gray-800 dark:text-gray-100">
+        Suas tarefas
+      </h1>
 
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="mx-auto mt-8 grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-3">
           {columns.map(({ title, status }) => (
             <TaskColumn
               key={status}
@@ -172,6 +163,7 @@ export default function Home() {
               onTogglePause={togglePause}
               onMoveLeft={handleMoveLeft}
               onMoveRight={handleMoveRight}
+              onArchive={archiveTask}
               onAddNew={() => setAddingToColumn(status)}
             />
           ))}

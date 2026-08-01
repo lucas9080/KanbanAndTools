@@ -17,6 +17,7 @@ interface TaskColumnProps {
   onTogglePause: (id: string) => void;
   onMoveLeft: (id: string) => void;
   onMoveRight: (id: string) => void;
+  onArchive: (id: string) => void;
   onAddNew: () => void;
 }
 
@@ -35,6 +36,7 @@ export function TaskColumn({
   onTogglePause,
   onMoveLeft,
   onMoveRight,
+  onArchive,
   onAddNew,
 }: TaskColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
@@ -66,6 +68,7 @@ export function TaskColumn({
               onTogglePause={onTogglePause}
               onMoveLeft={onMoveLeft}
               onMoveRight={onMoveRight}
+              onArchive={onArchive}
             />
           ))}
         </SortableContext>
