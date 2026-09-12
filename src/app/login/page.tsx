@@ -97,9 +97,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="mt-6 text-center text-xs text-gray-400 dark:text-gray-500">
-          Credenciais de teste: <strong>dashkanban</strong> / <strong>12345</strong>
-        </p>
+         
       </div>
     </main>
   );
