@@ -21,7 +21,7 @@ export default function LoginPage() {
     setTimeout(() => {
       const success = login(username, password);
       if (success) {
-        router.push("/");
+        router.push("/dashboard");
       } else {
         setError("Usuário ou senha inválidos.");
         setLoading(false);

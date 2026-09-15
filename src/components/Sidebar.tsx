@@ -6,8 +6,9 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 
 const navItems = [
-  { href: "/", label: "Suas tarefas", icon: "🗂️" },
-  { href: "/arquivadas", label: "Tarefas arquivadas", icon: "🗃️" },
+  { href: "/dashboard", label: "Suas tarefas", icon: "🗂️" },
+  { href: "/dashboard/arquivadas", label: "Tarefas arquivadas", icon: "🗃️" },
+  { href: "/dashboard/financeiro", label: "Financeiro", icon: "💰" },
 ];
 
 export function Sidebar() {
@@ -28,8 +29,8 @@ export function Sidebar() {
       <nav className="flex-1 space-y-1 p-3">
         {navItems.map((item) => {
           const isActive =
-            item.href === "/"
-              ? pathname === "/"
+            item.href === "/dashboard"
+              ? pathname === "/dashboard"
               : pathname.startsWith(item.href);
           return (
             <Link
