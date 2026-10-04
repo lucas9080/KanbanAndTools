@@ -4,6 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { type Task } from "@/context/TaskContext";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface SortableTaskCardProps {
   task: Task;
@@ -24,6 +25,7 @@ export function SortableTaskCard({
   onMoveRight,
   onArchive,
 }: SortableTaskCardProps) {
+  const router = useRouter();
   const {
     attributes,
     listeners,
@@ -66,6 +68,11 @@ export function SortableTaskCard({
         style={style}
         {...attributes}
         {...listeners}
+        onClick={(event) => {
+          if (task.link && !(event.target as HTMLElement).closest("button")) {
+            router.push(task.link);
+          }
+        }}
         className={`group relative rounded-lg border p-4 shadow-sm transition-colors cursor-grab active:cursor-grabbing ${
           task.paused
             ? "border-yellow-400 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-900/30"
@@ -110,6 +117,12 @@ export function SortableTaskCard({
             }`}
           >
             {task.description}
+          </p>
+        )}
+
+        {task.link && (
+          <p className="mb-3 text-xs font-medium text-blue-600 dark:text-blue-400">
+            Clique no card para abrir o Financeiro →
           </p>
         )}
 

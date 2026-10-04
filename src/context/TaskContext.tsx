@@ -16,13 +16,14 @@ export interface Task {
   paused: boolean;
   pauseReason?: string;
   archived: boolean;
+  link?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 interface TaskContextType {
   tasks: Task[];
-  addTask: (title: string, description: string) => void;
+  addTask: (title: string, description: string, link?: string) => void;
   editTask: (id: string, title: string, description: string) => void;
   removeTask: (id: string) => void;
   togglePause: (id: string, reason?: string) => void;
@@ -58,7 +59,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("kanban-tasks", JSON.stringify(tasks));
   }, [tasks]);
 
-  const addTask = (title: string, description: string) => {
+  const addTask = (title: string, description: string, link?: string) => {
     const now = new Date().toISOString();
     const task: Task = {
       id: generateId(),
@@ -67,6 +68,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       status: "todo",
       paused: false,
       archived: false,
+      link,
       createdAt: now,
       updatedAt: now,
     };

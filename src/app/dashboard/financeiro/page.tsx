@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useFinance, type TransactionType } from "@/context/FinanceContext";
+import { useTasks } from "@/context/TaskContext";
 
 const transactionOptions: Record<TransactionType, { label: string; helper: string; icon: string; color: string }> = {
   income: { label: "Entrada", helper: "Salário, extras ou valores por fora", icon: "↗", color: "bg-emerald-600" },
@@ -17,9 +18,11 @@ export default function FinancePage() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const { transactions, addTransaction, removeTransaction } = useFinance();
+  const { addTask } = useTasks();
   const [type, setType] = useState<TransactionType>("income");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
+  const [kanbanMessage, setKanbanMessage] = useState("");
 
   useEffect(() => {
     if (!isAuthenticated) router.push("/login");
@@ -46,8 +49,15 @@ export default function FinancePage() {
     const value = Number(amount.replace(",", "."));
     if (!description.trim() || !Number.isFinite(value) || value <= 0) return;
     addTransaction(description.trim(), value, type);
+    const option = transactionOptions[type];
+    addTask(
+      `${option.icon} ${option.label}: ${description.trim()}`,
+      `${option.label} de ${currency.format(value)} registrada em ${new Date().toLocaleDateString("pt-BR")}. Clique neste card para abrir o Financeiro.`,
+      "/dashboard/financeiro"
+    );
     setDescription("");
     setAmount("");
+    setKanbanMessage("Atalho financeiro criado na coluna A FAZER do Kanban.");
   };
 
   return (
@@ -81,7 +91,8 @@ export default function FinancePage() {
             <form onSubmit={submit} className="mt-5 space-y-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição<input value={description} onChange={(event) => setDescription(event.target.value)} placeholder={transactionOptions[type].helper} className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white" /></label>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Valor (R$)<input inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0,00" className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white" /></label>
-              <button className={`w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-95 ${transactionOptions[type].color}`}>Adicionar {transactionOptions[type].label.toLowerCase()}</button>
+              <button className={`w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-95 ${transactionOptions[type].color}`}>Adicionar e criar atalho no Kanban</button>
+              {kanbanMessage && <p className="text-center text-sm font-medium text-emerald-700 dark:text-emerald-300">{kanbanMessage}</p>}
             </form>
           </section>
 
